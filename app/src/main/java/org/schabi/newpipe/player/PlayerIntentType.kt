@@ -9,6 +9,7 @@ import kotlinx.parcelize.Parcelize
 enum class PlayerIntentType {
     Enqueue,
     EnqueueNext,
+    EnqueueNextFromExternal,
     TimestampChange,
     AllOthers
 }

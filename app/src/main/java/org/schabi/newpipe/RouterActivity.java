@@ -580,6 +580,13 @@ public class RouterActivity extends AppCompatActivity {
             }
         }
 
+        returnedItems.add(new AdapterChoiceItem(getString(R.string.enqueue_next_key),
+                getString(R.string.enqueue_next),
+                R.drawable.ic_add_circle_outline));
+
+        returnedItems.add(new AdapterChoiceItem(getString(R.string.enqueue_key),
+                getString(R.string.enqueue),
+                R.drawable.ic_drag_handle));
         return returnedItems;
     }
 
@@ -989,6 +996,8 @@ public class RouterActivity extends AppCompatActivity {
         public Consumer<Info> getResultHandler(final Choice choice) {
             return info -> {
                 final String videoPlayerKey = getString(R.string.video_player_key);
+                final String enqueueNextKey = getString(R.string.enqueue_next_key);
+                final String enqueueKey = getString(R.string.enqueue_key);
                 final String backgroundPlayerKey = getString(R.string.background_player_key);
                 final String popupPlayerKey = getString(R.string.popup_player_key);
 
@@ -1025,8 +1034,11 @@ public class RouterActivity extends AppCompatActivity {
                 } else {
                     return;
                 }
-
-                if (choice.playerChoice.equals(videoPlayerKey)) {
+                if (enqueueNextKey.equals(choice.playerChoice)) {
+                    NavigationHelper.enqueueNextFromExternalOnPlayer(this, playQueue);
+                } else if (enqueueKey.equals(choice.playerChoice)) {
+                    NavigationHelper.enqueueOnPlayer(this, playQueue);
+                } else if (choice.playerChoice.equals(videoPlayerKey)) {
                     NavigationHelper.playOnMainPlayer(this, playQueue, false);
                 } else if (choice.playerChoice.equals(backgroundPlayerKey)) {
                     NavigationHelper.playOnBackgroundPlayer(this, playQueue, true);

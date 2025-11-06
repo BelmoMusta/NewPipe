@@ -262,6 +262,37 @@ public abstract class PlayQueue implements Serializable {
         broadcast(new AppendEvent(0));
     }
 
+    public synchronized void append(@NonNull final List<PlayQueueItem> items, final boolean next) {
+        final List<PlayQueueItem> itemList = new ArrayList<>(items);
+
+        if (isShuffled()) {
+            backup.addAll(itemList);
+            Collections.shuffle(itemList);
+        }
+        if (!streams.isEmpty() && streams.get(streams.size() - 1).isAutoQueued()
+                && !itemList.get(0).isAutoQueued()) {
+            streams.remove(streams.size() - 1);
+        }
+        if (!next) {
+            streams.addAll(itemList);
+        } else if (streams.isEmpty()) {
+            streams.addAll(itemList);
+        } else {
+            final List<PlayQueueItem> beforePosition = new ArrayList<>();
+            beforePosition.add(streams.get(0));
+            final List<PlayQueueItem> afterPosition = new ArrayList<>();
+            for (int i = 1; i < streams.size(); i++) {
+                afterPosition.add(streams.get(i));
+            }
+
+            streams.clear();
+            streams.addAll(beforePosition);
+            streams.addAll(itemList);
+            streams.addAll(afterPosition);
+        }
+
+        broadcast(new AppendEvent(itemList.size()));
+    }
     /**
      * Appends the given {@link PlayQueueItem}s to the current play queue.
      * <p>
@@ -275,19 +306,7 @@ public abstract class PlayQueue implements Serializable {
      * @param items {@link PlayQueueItem}s to append
      */
     public synchronized void append(@NonNull final List<PlayQueueItem> items) {
-        final List<PlayQueueItem> itemList = new ArrayList<>(items);
-
-        if (isShuffled()) {
-            backup.addAll(itemList);
-            Collections.shuffle(itemList);
-        }
-        if (!streams.isEmpty() && streams.get(streams.size() - 1).isAutoQueued()
-                && !itemList.get(0).isAutoQueued()) {
-            streams.remove(streams.size() - 1);
-        }
-        streams.addAll(itemList);
-
-        broadcast(new AppendEvent(itemList.size()));
+        append(items, false);
     }
 
     /**

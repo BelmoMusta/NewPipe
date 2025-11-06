@@ -55,7 +55,7 @@ android {
             isDebuggable = true
 
             // suffix the app id and the app name with git branch name
-            val defaultBranches = listOf("master", "dev")
+            val defaultBranches = listOf("master", "dev", "feat/enque-from-external-link")
             val workingBranch = gitWorkingBranch.getOrElse("")
             val normalizedWorkingBranch = workingBranch
                 .replaceFirst("^[^A-Za-z]+".toRegex(), "")
@@ -64,7 +64,7 @@ android {
             if (normalizedWorkingBranch.isEmpty() || workingBranch in defaultBranches) {
                 // default values when branch name could not be determined or is master or dev
                 applicationIdSuffix = ".debug"
-                resValue("string", "app_name", "NewPipe Debug")
+                resValue("string", "app_name", "MustaPipe")
             } else {
                 applicationIdSuffix = ".debug.$normalizedWorkingBranch"
                 resValue("string", "app_name", "NewPipe $workingBranch")
