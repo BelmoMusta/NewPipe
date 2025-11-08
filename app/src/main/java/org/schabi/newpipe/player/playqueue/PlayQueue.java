@@ -278,10 +278,13 @@ public abstract class PlayQueue implements Serializable {
         } else if (streams.isEmpty()) {
             streams.addAll(itemList);
         } else {
+            final int currentIndex = getIndex();
             final List<PlayQueueItem> beforePosition = new ArrayList<>();
-            beforePosition.add(streams.get(0));
+            for (int i = 0; i <= currentIndex; i++) {
+                beforePosition.add(streams.get(i));
+            }
             final List<PlayQueueItem> afterPosition = new ArrayList<>();
-            for (int i = 1; i < streams.size(); i++) {
+            for (int i = currentIndex + 1; i < streams.size(); i++) {
                 afterPosition.add(streams.get(i));
             }
 
