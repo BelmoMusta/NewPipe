@@ -135,6 +135,7 @@ public final class PlayQueueActivity extends AppCompatActivity
                 NavigationHelper.openSettings(this);
                 return true;
             case R.id.action_append_playlist:
+            case R.id.action_add_to_playlist:
                 PlaylistDialog.showForPlayQueue(player, getSupportFragmentManager());
                 return true;
             case R.id.action_playback_speed:
