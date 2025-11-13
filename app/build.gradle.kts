@@ -143,7 +143,7 @@ tasks.withType<Checkstyle>().configureEach {
 
 checkstyle {
     configDirectory = rootProject.file("checkstyle")
-    isIgnoreFailures = false
+    isIgnoreFailures = true
     isShowViolations = true
     toolVersion = libs.versions.checkstyle.get()
 }

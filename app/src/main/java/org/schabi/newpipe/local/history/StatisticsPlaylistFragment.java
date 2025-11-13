@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.evernote.android.state.State;
 import com.google.android.material.snackbar.Snackbar;
@@ -52,7 +54,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 
 public class StatisticsPlaylistFragment
         extends BaseLocalListFragment<List<StreamStatisticsEntry>, Void>
-        implements PlaylistControlViewHolder {
+        implements PlaylistControlViewHolder, ActivityWithDisposables {
     private final CompositeDisposable disposables = new CompositeDisposable();
     @State
     Parcelable itemsListState;
@@ -95,7 +97,19 @@ public class StatisticsPlaylistFragment
     public View onCreateView(@NonNull final LayoutInflater inflater,
                              @Nullable final ViewGroup container,
                              @Nullable final Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_playlist, container, false);
+
+        final View v = inflater.inflate(R.layout.fragment_playlist, container, false);
+        final View button = v.findViewById(R.id.open_url);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                final FragmentManager fm =
+                        getActivity().getSupportFragmentManager();
+                final OpenURLDialogAction action = new OpenURLDialogAction(StatisticsPlaylistFragment.this);
+                new OpenURLDialog(action).show(fm, "OPEN-URL");
+            }
+        });
+        return v;
     }
 
     @Override
@@ -387,6 +401,16 @@ public class StatisticsPlaylistFragment
     private enum StatisticSortMode {
         LAST_PLAYED,
         MOST_PLAYED,
+    }
+
+    @Override
+    public CompositeDisposable disposables() {
+        return disposables;
+    }
+
+    @Override
+    public AppCompatActivity activity() {
+        return activity;
     }
 }
 

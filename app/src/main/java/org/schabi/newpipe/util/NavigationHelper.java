@@ -89,14 +89,15 @@ public final class NavigationHelper {
                                              @NonNull final Class<T> targetClazz,
                                              @Nullable final PlayQueue playQueue,
                                              @NonNull final PlayerIntentType playerIntentType) {
-        final String cacheKey = Optional.ofNullable(playQueue)
-                .map(queue -> SerializedCache.getInstance().put(queue, PlayQueue.class))
-                .orElse(null);
-        return new Intent(context, targetClazz)
-                .putExtra(Player.PLAY_QUEUE_KEY, cacheKey)
-                .putExtra(Player.PLAYER_TYPE, PlayerType.MAIN)
-                .putExtra(PlayerService.SHOULD_START_FOREGROUND_EXTRA, true)
-                .putExtra(Player.PLAYER_INTENT_TYPE, playerIntentType);
+        return getPlayerIntent(context, targetClazz, playQueue, playerIntentType, PlayerType.MAIN);
+    }
+
+    @NonNull
+    public static <T> Intent getPlayerIntentOnBackground(@NonNull final Context context,
+                                             @NonNull final Class<T> targetClazz,
+                                             @Nullable final PlayQueue playQueue,
+                                             @NonNull final PlayerIntentType playerIntentType) {
+        return getPlayerIntent(context, targetClazz, playQueue, playerIntentType, PlayerType.AUDIO);
     }
 
     @NonNull
@@ -116,6 +117,23 @@ public final class NavigationHelper {
         return getPlayerIntent(context, targetClazz, playQueue, playerIntentType)
                 // see comment in `getPlayerEnqueueIntent` as to why `resumePlayback` is false
                 .putExtra(Player.RESUME_PLAYBACK, false);
+    }
+
+    @NonNull
+    public static <T> Intent getPlayerIntent(@NonNull final Context context,
+                                                        @NonNull final Class<T> targetClazz,
+                                                        @Nullable final PlayQueue playQueue,
+                                                        @NonNull final PlayerIntentType
+                                                                playerIntentType,
+                                                       @NonNull final PlayerType playerType) {
+        final String cacheKey = Optional.ofNullable(playQueue)
+                .map(queue -> SerializedCache.getInstance().put(queue, PlayQueue.class))
+                .orElse(null);
+        return new Intent(context, targetClazz)
+                .putExtra(Player.PLAY_QUEUE_KEY, cacheKey)
+                .putExtra(PlayerService.SHOULD_START_FOREGROUND_EXTRA, true)
+                .putExtra(Player.PLAYER_INTENT_TYPE, playerIntentType)
+                .putExtra(Player.PLAYER_TYPE, playerType);
     }
 
     /* PLAY */

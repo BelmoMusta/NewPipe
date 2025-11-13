@@ -1,8 +1,6 @@
 package org.schabi.newpipe.settings.migration;
 
 import static org.schabi.newpipe.MainActivity.DEBUG;
-import static org.schabi.newpipe.extractor.ServiceList.SoundCloud;
-import static org.schabi.newpipe.extractor.ServiceList.YouTube;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -168,9 +166,6 @@ public final class SettingMigrations {
             final TabsManager tabsManager = TabsManager.getManager(context);
             final List<Tab> tabs = tabsManager.getTabs();
             final List<Tab> cleanedTabs = tabs.stream()
-                    .filter(tab -> !(tab instanceof Tab.KioskTab kioskTab
-                            && kioskTab.getKioskServiceId() == SoundCloud.getServiceId()
-                            && kioskTab.getKioskId().equals("Top 50")))
                     .collect(Collectors.toUnmodifiableList());
             if (tabs.size() != cleanedTabs.size()) {
                 tabsManager.saveTabs(cleanedTabs);
@@ -198,9 +193,6 @@ public final class SettingMigrations {
             final TabsManager tabsManager = TabsManager.getManager(context);
             final List<Tab> tabs = tabsManager.getTabs();
             final List<Tab> cleanedTabs = tabs.stream()
-                    .filter(tab -> !(tab instanceof Tab.KioskTab kioskTab
-                            && kioskTab.getKioskServiceId() == YouTube.getServiceId()
-                            && kioskTab.getKioskId().equals("Trending")))
                     .collect(Collectors.toUnmodifiableList());
             if (tabs.size() != cleanedTabs.size()) {
                 tabsManager.saveTabs(cleanedTabs);
