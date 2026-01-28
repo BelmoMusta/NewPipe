@@ -21,7 +21,6 @@ import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.fragments.BlankFragment;
 import org.schabi.newpipe.fragments.list.channel.ChannelFragment;
 import org.schabi.newpipe.fragments.list.kiosk.DefaultKioskFragment;
-import org.schabi.newpipe.fragments.list.kiosk.KioskFragment;
 import org.schabi.newpipe.fragments.list.playlist.PlaylistFragment;
 import org.schabi.newpipe.local.bookmark.BookmarkFragment;
 import org.schabi.newpipe.local.feed.FeedFragment;
@@ -37,7 +36,6 @@ public abstract class Tab {
     private static final String JSON_TAB_ID_KEY = "tab_id";
 
     private static final String NO_NAME = "<no-name>";
-    private static final String NO_ID = "<no-id>";
     private static final String NO_URL = "<no-url>";
 
     Tab() {
@@ -87,8 +85,6 @@ public abstract class Tab {
 
         if (jsonObject != null) {
             switch (type) {
-                case KIOSK:
-                    return new KioskTab(jsonObject);
                 case CHANNEL:
                     return new ChannelTab(jsonObject);
                 case PLAYLIST:
@@ -162,7 +158,6 @@ public abstract class Tab {
         FEED(new FeedTab()),
         BOOKMARKS(new BookmarksTab()),
         HISTORY(new HistoryTab()),
-        KIOSK(new KioskTab()),
         CHANNEL(new ChannelTab()),
         PLAYLIST(new PlaylistTab()),
         FEEDGROUP(new FeedGroupTab());
@@ -307,90 +302,6 @@ public abstract class Tab {
         @Override
         public StatisticsPlaylistFragment getFragment(final Context context) {
             return new StatisticsPlaylistFragment();
-        }
-    }
-
-    public static class KioskTab extends Tab {
-        public static final int ID = 5;
-        private static final String JSON_KIOSK_SERVICE_ID_KEY = "service_id";
-        private static final String JSON_KIOSK_ID_KEY = "kiosk_id";
-        private int kioskServiceId;
-        private String kioskId;
-
-        private KioskTab() {
-            this(-1, NO_ID);
-        }
-
-        public KioskTab(final int kioskServiceId, final String kioskId) {
-            this.kioskServiceId = kioskServiceId;
-            this.kioskId = kioskId;
-        }
-
-        public KioskTab(final JsonObject jsonObject) {
-            super(jsonObject);
-        }
-
-        @Override
-        public int getTabId() {
-            return ID;
-        }
-
-        @Override
-        public String getTabName(final Context context) {
-            return KioskTranslator.getTranslatedKioskName(kioskId, context);
-        }
-
-        @DrawableRes
-        @Override
-        public int getTabIconRes(final Context context) {
-            final int kioskIcon = KioskTranslator.getKioskIcon(kioskId);
-
-            if (kioskIcon <= 0) {
-                throw new IllegalStateException("Kiosk ID is not valid: \"" + kioskId + "\"");
-            }
-
-            return kioskIcon;
-        }
-
-        @Override
-        public KioskFragment getFragment(final Context context) throws ExtractionException {
-            return KioskFragment.getInstance(kioskServiceId, kioskId);
-        }
-
-        @Override
-        protected void writeDataToJson(final JsonStringWriter writerSink) {
-            writerSink.value(JSON_KIOSK_SERVICE_ID_KEY, kioskServiceId)
-                    .value(JSON_KIOSK_ID_KEY, kioskId);
-        }
-
-        @Override
-        protected void readDataFromJson(final JsonObject jsonObject) {
-            kioskServiceId = jsonObject.getInt(JSON_KIOSK_SERVICE_ID_KEY, -1);
-            kioskId = jsonObject.getString(JSON_KIOSK_ID_KEY, NO_ID);
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (!(obj instanceof KioskTab)) {
-                return false;
-            }
-            final KioskTab other = (KioskTab) obj;
-            return super.equals(obj)
-                    && kioskServiceId == other.kioskServiceId
-                    && kioskId.equals(other.kioskId);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(getTabId(), kioskServiceId, kioskId);
-        }
-
-        public int getKioskServiceId() {
-            return kioskServiceId;
-        }
-
-        public String getKioskId() {
-            return kioskId;
         }
     }
 

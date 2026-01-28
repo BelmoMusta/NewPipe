@@ -92,12 +92,11 @@ public class TabsJsonHelperTest {
         final Tab.SubscriptionsTab subscriptionsTab = new Tab.SubscriptionsTab();
         final Tab.ChannelTab channelTab = new Tab.ChannelTab(
                 666, "https://example.org", "testName");
-        final Tab.KioskTab kioskTab = new Tab.KioskTab(123, "trending_key");
         final Tab.FeedGroupTab feedGroupTab = new Tab.FeedGroupTab(
                 1L, "x", 123);
 
         final List<Tab> tabs = Arrays.asList(
-                blankTab, defaultKioskTab, subscriptionsTab, channelTab, kioskTab, feedGroupTab);
+                blankTab, defaultKioskTab, subscriptionsTab, channelTab, feedGroupTab);
         final String returnedJson = TabsJsonHelper.getJsonToSave(tabs);
 
         // Reading
@@ -126,13 +125,6 @@ public class TabsJsonHelperTest {
                 channelTabFromReturnedJson.getChannelServiceId());
         assertEquals(channelTab.getChannelUrl(), channelTabFromReturnedJson.getChannelUrl());
         assertEquals(channelTab.getChannelName(), channelTabFromReturnedJson.getChannelName());
-
-        final Tab.KioskTab kioskTabFromReturnedJson = requireNonNull((Tab.KioskTab) Tab.from(
-                (JsonObject) tabsFromArray.get(4)));
-        assertEquals(kioskTab.getTabId(), kioskTabFromReturnedJson.getTabId());
-        assertEquals(kioskTab.getKioskServiceId(), kioskTabFromReturnedJson.getKioskServiceId());
-        assertEquals(kioskTab.getKioskId(), kioskTabFromReturnedJson.getKioskId());
-
         final Tab.FeedGroupTab grpTabFromReturnedJson = requireNonNull(
                 (Tab.FeedGroupTab) Tab.from((JsonObject) tabsFromArray.get(5)
                 ));

@@ -405,6 +405,16 @@ public final class Player implements PlaybackListener, Listener {
                 // yet so we should start the player and add the new video
                 break;
             }
+            case EnqueueNextFromExternal -> {
+                if (playQueue != null) {
+                    final PlayQueue newQueue = getPlayQueueFromCache(intent);
+                    if (newQueue == null) {
+                        return;
+                    }
+                    playQueue.append(newQueue.getStreams(), true);
+                    return;
+                }
+            }
             case TimestampChange -> {
                 final var data = Objects.requireNonNull(IntentCompat.getParcelableExtra(intent,
                         PLAYER_INTENT_DATA, TimestampChangeData.class));

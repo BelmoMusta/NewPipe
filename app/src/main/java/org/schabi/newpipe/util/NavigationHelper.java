@@ -89,14 +89,15 @@ public final class NavigationHelper {
                                              @NonNull final Class<T> targetClazz,
                                              @Nullable final PlayQueue playQueue,
                                              @NonNull final PlayerIntentType playerIntentType) {
-        final String cacheKey = Optional.ofNullable(playQueue)
-                .map(queue -> SerializedCache.getInstance().put(queue, PlayQueue.class))
-                .orElse(null);
-        return new Intent(context, targetClazz)
-                .putExtra(Player.PLAY_QUEUE_KEY, cacheKey)
-                .putExtra(Player.PLAYER_TYPE, PlayerType.MAIN)
-                .putExtra(PlayerService.SHOULD_START_FOREGROUND_EXTRA, true)
-                .putExtra(Player.PLAYER_INTENT_TYPE, playerIntentType);
+        return getPlayerIntent(context, targetClazz, playQueue, playerIntentType, PlayerType.MAIN);
+    }
+
+    @NonNull
+    public static <T> Intent getPlayerIntentOnBackground(@NonNull final Context context,
+                                             @NonNull final Class<T> targetClazz,
+                                             @Nullable final PlayQueue playQueue,
+                                             @NonNull final PlayerIntentType playerIntentType) {
+        return getPlayerIntent(context, targetClazz, playQueue, playerIntentType, PlayerType.AUDIO);
     }
 
     @NonNull
@@ -110,10 +111,29 @@ public final class NavigationHelper {
     @NonNull
     public static <T> Intent getPlayerEnqueueNextIntent(@NonNull final Context context,
                                                         @NonNull final Class<T> targetClazz,
-                                                        @Nullable final PlayQueue playQueue) {
-        return getPlayerIntent(context, targetClazz, playQueue, PlayerIntentType.EnqueueNext)
+                                                        @Nullable final PlayQueue playQueue,
+                                                        @NonNull final PlayerIntentType
+                                                                    playerIntentType) {
+        return getPlayerIntent(context, targetClazz, playQueue, playerIntentType)
                 // see comment in `getPlayerEnqueueIntent` as to why `resumePlayback` is false
                 .putExtra(Player.RESUME_PLAYBACK, false);
+    }
+
+    @NonNull
+    public static <T> Intent getPlayerIntent(@NonNull final Context context,
+                                                        @NonNull final Class<T> targetClazz,
+                                                        @Nullable final PlayQueue playQueue,
+                                                        @NonNull final PlayerIntentType
+                                                                playerIntentType,
+                                                       @NonNull final PlayerType playerType) {
+        final String cacheKey = Optional.ofNullable(playQueue)
+                .map(queue -> SerializedCache.getInstance().put(queue, PlayQueue.class))
+                .orElse(null);
+        return new Intent(context, targetClazz)
+                .putExtra(Player.PLAY_QUEUE_KEY, cacheKey)
+                .putExtra(PlayerService.SHOULD_START_FOREGROUND_EXTRA, true)
+                .putExtra(Player.PLAYER_INTENT_TYPE, playerIntentType)
+                .putExtra(Player.PLAYER_TYPE, playerType);
     }
 
     /* PLAY */
@@ -201,17 +221,30 @@ public final class NavigationHelper {
         enqueueOnPlayer(context, queue, playerType);
     }
 
-    /* ENQUEUE NEXT */
-    public static void enqueueNextOnPlayer(final Context context, final PlayQueue queue) {
+    private static void enqueueNextOnPlayer(final Context context, final PlayQueue queue,
+                                            final PlayerIntentType playerIntentType) {
         PlayerType playerType = PlayerHolder.getInstance().getType();
         if (playerType == null) {
             Log.e(TAG, "Enqueueing next but no player is open; defaulting to background player");
             playerType = PlayerType.AUDIO;
         }
         Toast.makeText(context, R.string.enqueued_next, Toast.LENGTH_SHORT).show();
-        final Intent intent = getPlayerEnqueueNextIntent(context, PlayerService.class, queue)
+        final Intent intent = getPlayerEnqueueNextIntent(context, PlayerService.class, queue,
+                playerIntentType)
                 .putExtra(Player.PLAYER_TYPE, playerType);
         ContextCompat.startForegroundService(context, intent);
+    }
+
+    /* ENQUEUE NEXT */
+
+    public static void enqueueNextOnPlayer(final Context context, final PlayQueue queue) {
+        enqueueNextOnPlayer(context, queue, PlayerIntentType.EnqueueNext);
+    }
+
+    /* ENQUEUE NEXT FROM EXTERNE */
+    public static void enqueueNextFromExternalOnPlayer(final Context context,
+                                                       final PlayQueue queue) {
+        enqueueNextOnPlayer(context, queue, PlayerIntentType.EnqueueNextFromExternal);
     }
 
     /*//////////////////////////////////////////////////////////////////////////

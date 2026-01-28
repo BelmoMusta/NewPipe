@@ -9,6 +9,7 @@
     <string name="ok">OK</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="open">Open</string>
     <string name="open_in_browser">Open in browser</string>
     <string name="mark_as_watched">Mark as watched</string>
     <string name="open_in_popup_mode">Open in popup mode</string>
@@ -461,6 +462,7 @@
     <string name="rename_playlist">Rename</string>
     <string name="name">Name</string>
     <string name="add_to_playlist">Add to playlist</string>
+    <string name="enqueue_next">Enqueue next</string>
     <string name="processing_may_take_a_moment">Processing… May take a moment</string>
     <string name="mute">Mute</string>
     <string name="unmute">Unmute</string>
